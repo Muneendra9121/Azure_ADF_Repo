@@ -1,0 +1,9 @@
+{
+	"name": "ade25Data-factory",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d83cc0cb-f2bc-4273-97ec-75bd35753f6d",
+		"tenantId": "8dc2e252-2490-4c90-9f64-a280de006ff6"
+	}
+}

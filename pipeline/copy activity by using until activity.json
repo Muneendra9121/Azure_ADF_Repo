@@ -1,0 +1,135 @@
+{
+	"name": "copy activity by using until activity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until_activity",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@variables('file_check')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Get file data",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "Blob_Storage_Dataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"container": {
+											"value": "@pipeline().parameters.container",
+											"type": "Expression"
+										},
+										"folder": {
+											"value": "@pipeline().parameters.folder",
+											"type": "Expression"
+										},
+										"file": {
+											"value": "@pipeline().parameters.filename",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"exists"
+								],
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Get file data",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@bool(activity('Get file data').output.exists)",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Wait1",
+										"type": "Wait",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"waitTimeInSeconds": 60
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "updated file check",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "file_check",
+											"value": true
+										}
+									}
+								]
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"container": {
+				"type": "string",
+				"defaultValue": "input1"
+			},
+			"filename": {
+				"type": "string",
+				"defaultValue": "salary_data"
+			},
+			"folder": {
+				"type": "string",
+				"defaultValue": "employee_schema"
+			}
+		},
+		"variables": {
+			"file_check": {
+				"type": "Boolean",
+				"defaultValue": false
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-04-20T11:36:20Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
